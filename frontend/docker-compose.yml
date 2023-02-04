@@ -1,0 +1,32 @@
+version: '3'
+services:
+  web:
+    # Allows standard input and output to the container
+    stdin_open: true 
+    # Creates an environment varible
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    # Build an image using "Dockerfile.dev" found in the same directory of the docker-compose.yml file
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # Map localhost port 3000 to container port 3000
+    ports:
+      - '3000:3000'
+    # Perform volume mapping from the localhost to the container 
+    volumes:
+      - /app/node_modules 
+      - .:/app
+    # Always restart the container unless explicitly stopped or Docker is restarted
+    restart: always
+  # Creates a test container using the same image used to build the web container
+  tests:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    # Overides the command specified in the Dockerfile.dev file
+    command: ['npm', 'run', 'test']
